@@ -29,6 +29,9 @@ Base.prepare(autoload_with=engine)
 Measurement = Base.classes.measurement
 Station = Base.classes.station
 
+# Create session link to database
+session = Session(engine)
+
 
 
 #################################################
@@ -45,6 +48,7 @@ app = Flask(__name__)
 
 ### Homepage Route
 @app.route("/")
+
 def welcome():
     """List all available api routes."""
     return (
@@ -56,21 +60,16 @@ def welcome():
 
 ### Precipitation Route
 @app.route("/api/v1.0/precipitation")
+
 def precipitation():
     """Retrieve JSON representation of precipitation data for previous year"""
-    session = Session(engine)
-
     results = session.query(Measurement.date,Measurement.prcp).\
                         filter(Measurement.date >= '2016-08-23').\
                         all()
     session.close()
 
-    # Create a dictionary from the row data (date:prcp) and append to a list of all_precip
-    all_precip = []
-    for date, prcp in results:
-        precipitation_dict = {}
-        precipitation_dict[date] = prcp
-        all_precip.append(precipitation_dict)
+    # List comprehension to create list of dictionaries (date:prcp) from the row data 
+    all_precip = [{date: prcp} for date, prcp in results]
 
     return jsonify(all_precip)
 
@@ -78,9 +77,9 @@ def precipitation():
 
 ### Stations Route
 @app.route("/api/v1.0/stations")
+
 def stations():
     """Return JSON list of stations"""
-    session = Session(engine)
     results = session.query(Station.station).all()
     
     session.close()
@@ -92,9 +91,9 @@ def stations():
 
 ### Tobs Route
 @app.route("/api/v1.0/tobs")
+
 def tobs():
     """Return JSON list of tobs for previous year"""
-    session = Session(engine)
 
     #Query most past year of tobs data from most active station
     results = session.query(Measurement.tobs).\
@@ -112,9 +111,9 @@ def tobs():
 ### Start/End Date Route
 @app.route("/api/v1.0/gettobs/<start>")
 @app.route("/api/v1.0/gettobs/<start>/<end>")
+
 def start_end_date(start, end='2017-08-23'):
     """Return JSON list of min/avg/max temp between given start and end dates"""
-    session = Session(engine)
 
     # Create list of one tuple containing min, max, avg tobs for date range
     results = session.query(func.min(Measurement.tobs), \

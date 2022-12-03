@@ -52,10 +52,12 @@ app = Flask(__name__)
 def welcome():
     """List all available api routes."""
     return (
-        f"Available Routes:<br/>"
-        f"/api/v1.0/precipitation<br/>"
-        f"/api/v1.0/stations<br/>"
-        f"/api/v1.0/tobs<br/>"
+        f"Available Routes:<br>"
+        f"/api/v1.0/precipitation<br>"
+        f"/api/v1.0/stations<br>"
+        f"/api/v1.0/tobs<br>"
+        f"/api/v1.0/gettobs/start_date<br>"
+        f"/api/v1.0/gettobs/start_date/end_date"
     )
 
 ### Precipitation Route
@@ -66,6 +68,7 @@ def precipitation():
     results = session.query(Measurement.date,Measurement.prcp).\
                         filter(Measurement.date >= '2016-08-23').\
                         all()
+    # Close session
     session.close()
 
     # List comprehension to create list of dictionaries (date:prcp) from the row data 
@@ -82,6 +85,7 @@ def stations():
     """Return JSON list of stations"""
     results = session.query(Station.station).all()
     
+    # Close session
     session.close()
 
     # Convert list of tuples into normal list
@@ -100,8 +104,13 @@ def tobs():
                     filter(Measurement.station == 'USC00519281').\
                     filter(Measurement.date >= '2016-08-23').all()
     
+    # Close session
+    session.close()
+
     # Convert list of tuples into normal list
     tobs_past_year = list(np.ravel(results))
+
+    
 
     return jsonify(tobs_past_year)
 
@@ -129,6 +138,9 @@ def start_end_date(start, end='2017-08-23'):
         tobs_dict["TMAX"] = tmax
         tobs_dict["TAVG"] = round(tavg,2)
         tobs_list.append(tobs_dict)
+
+    # Close session
+    session.close()
 
     return jsonify(tobs_list)
 

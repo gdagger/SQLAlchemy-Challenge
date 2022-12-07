@@ -62,7 +62,7 @@
 <img src="SurfsUp/Images/tobs.png" width="200"/>
 </p>
 
-- Created route that returns the lowest, highest, and average temperatures over a specified range. This requires the user to go to the "/api/v1.0/gettobs/" URL and enter a start date (YYYY-MM-DD) and optional end date. The default end date is set to the most recent date in the database.
+- Created route that returns the lowest, highest, and average temperatures over a specified range. This requires the user to go to the "/api/v1.0/gettobs/" URL and enter a start date (YYYY-MM-DD) and optional end date. The default end date is set to the most recent date in the database. I also added an if statement that checks if both the start and end dates are contained in the dataset and written in the form YYYY-MM-DD. If they are not valid, the route returns an error message and closes the session.
 
 <p align="center">
 <img src="SurfsUp/Images/start_date.png" width="200"/>

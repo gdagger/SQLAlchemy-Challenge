@@ -124,6 +124,18 @@ def tobs():
 def start_end_date(start, end='2017-08-23'):
     """Return JSON list of min/avg/max temp between given start and end dates"""
 
+    "Create a list of valid dates from the Measurement table"
+    date_list = []
+    for date in session.query(Measurement.date).all():
+        date_list.append(date[0])
+    
+    # Check if start (and end) dates are invalid (if so return error message and close session)
+    if (start not in date_list) or (end not in date_list):
+        session.close()
+        return (
+            "<strong>Error:</strong> One or both of these dates entered is not a valid date in the dataset.<br>"
+            "Please enter a date between 2010-01-01 and 2017-08-23 in the form YYYY-MM-DD.")
+
     # Create list of one tuple containing min, max, avg tobs for date range
     results = session.query(func.min(Measurement.tobs), \
                             func.max(Measurement.tobs),
